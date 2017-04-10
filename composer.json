@@ -1,5 +1,5 @@
 {
-  "name": "pimcore/compatibility-bridge",
+  "name": "pimcore4-compatibility-bridge",
   "license": "GPL-3.0+",
   "require": {
     "pimcore/core-version": ">=5.0.0-alpha.1",
