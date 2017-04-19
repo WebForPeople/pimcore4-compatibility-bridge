@@ -35,7 +35,7 @@ class PimcoreLegacyBundle extends Bundle
         $this->setupIncludePaths();
 
         $loader = new LegacyClassLoader();
-        $loader->register();
+        $loader->register(true);
 
         $this->defineConstants();
         $this->registerAutoloadPaths();
