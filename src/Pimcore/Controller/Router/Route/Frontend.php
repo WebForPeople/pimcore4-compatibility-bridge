@@ -105,31 +105,6 @@ class Frontend extends \Zend_Controller_Router_Route_Abstract
         // set the original path
         $originalPath = $path;
 
-        // check for password protection (http auth)
-        if ($config->general->http_auth) {
-            $username = $config->general->http_auth->username;
-            $password = $config->general->http_auth->password;
-            if ($username && $password && (!Tool::isFrontentRequestByAdmin() || !Tool\Authentication::authenticateSession())) {
-                $adapter = new \Zend_Auth_Adapter_Http([
-                    "accept_schemes" => "basic",
-                    "realm" => Tool::getHostname()
-                ]);
-
-                $basicResolver = new \Pimcore\Helper\Auth\Adapter\Http\ResolverStatic($username, $password);
-                $adapter->setBasicResolver($basicResolver);
-                $adapter->setRequest($front->getRequest());
-                $adapter->setResponse($front->getResponse());
-
-                $result = $adapter->authenticate();
-                if (!$result->isValid()) {
-                    // Bad userame/password, or canceled password prompt
-                    echo "Authentication Required";
-                    $front->getResponse()->sendResponse();
-                    exit;
-                }
-            }
-        }
-
         // check for a registered site
         try {
             // do not initialize a site if it is a "special" admin request
