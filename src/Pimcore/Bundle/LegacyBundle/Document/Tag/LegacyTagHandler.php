@@ -226,8 +226,10 @@ class LegacyTagHandler implements TagHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function renderAction($view, $controller, $action, $parent = null, array $params = [])
+    public function renderAction($view, $controller, $action, $parent = null, array $params = [], array $query = [], array $options = [])
     {
+        $params = array_merge($params, $query);
+
         /** @var View $view */
         return $view->action(
             $action,
