@@ -2,7 +2,7 @@
   "name": "pimcore/pimcore4-compatibility-bridge",
   "license": "GPL-3.0+",
   "require": {
-    "pimcore/core-version": ">=5.0.0-alpha.1",
+    "pimcore/core-version": ">=5@alpha",
     "php-di/php-di": "~5",
     "zendframework/zendframework1": "~1.12"
   },
