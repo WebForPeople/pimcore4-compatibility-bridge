@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Pimcore
  *
@@ -12,20 +15,19 @@
  * @license    http://www.pimcore.org/license     GPLv3 and PEL
  */
 
-namespace Pimcore\Bundle\LegacyBundle\Templating\Renderer;
-
+namespace Pimcore\Bundle\LegacyBundle\Document\Renderer;
 
 use Pimcore\Bundle\LegacyBundle\HttpKernel\Kernel as LegacyKernel;
+use Pimcore\Document\Renderer\DocumentRendererInterface;
 use Pimcore\Model\Document;
 use Pimcore\View;
 
-class DocumentRenderer {
-
+class LegacyDocumentRenderer implements DocumentRendererInterface
+{
     /**
      * @var LegacyKernel
      */
     protected $legacyKernel;
-
 
     public function __construct(LegacyKernel $legacyKernel)
     {
@@ -33,15 +35,23 @@ class DocumentRenderer {
     }
 
     /**
-     * renders document and returns rendered result as string
-     *
-     * @param Document $document
-     * @param array $params
-     * @param bool $useLayout
-     * @return string
+     * @inheritDoc
      */
-    public function render(Document $document, $params = [], $useLayout = false) {
+    public function render(Document\PageSnippet $document, array $attributes = [], array $query = [], array $options = []): string
+    {
+        $params = array_merge($attributes, $query, $options);
 
+        $useLayout = false;
+        if (isset($params['_useLayout'])) {
+            $useLayout = (bool)$params['_useLayout'];
+            unset($params['_useLayout']);
+        }
+
+        return $this->doRender($document, $params, $useLayout);
+    }
+
+    private function doRender(Document $document, array $params = [], bool $useLayout = false): string
+    {
         $this->legacyKernel->boot();
 
         $layout = null;
@@ -74,6 +84,7 @@ class DocumentRenderer {
         }
 
         $params["document"] = $document;
+
         $viewParamsBackup = [];
         foreach ($params as $key => $value) {
             if ($view->$key) {
@@ -127,6 +138,7 @@ class DocumentRenderer {
                         \Zend_Controller_Action_HelperBroker::addHelper($existingActionHelper);
 
                         $pluginClass = $layout->getPluginClass();
+
                         $front = $existingActionHelper->getFrontController();
                         if ($front->hasPlugin($pluginClass)) {
                             $plugin = $front->getPlugin($pluginClass);
@@ -148,5 +160,4 @@ class DocumentRenderer {
 
         return $content;
     }
-
 }

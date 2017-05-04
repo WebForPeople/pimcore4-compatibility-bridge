@@ -33,8 +33,8 @@ services:
         class: Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler
 
     # provides rendering of documents with legacy ZF1 stack
-    pimcore.templating.legacy_document_renderer:
-      class: Pimcore\Bundle\LegacyBundle\Templating\Renderer\DocumentRenderer
+    pimcore.document.legacy_renderer:
+      class: Pimcore\Bundle\LegacyBundle\Document\Renderer\DocumentRenderer
       arguments: ['@pimcore.legacy_kernel']
 
     # adds legacy plugin assets to admin interface and editmode
