@@ -206,7 +206,7 @@ class LegacyTagHandler implements TagHandlerInterface
             if (is_file($editScript) && $editmode) {
                 $view->editmode = true;
 
-                echo '<div class="pimcore_area_editmode_' . $tag->getName() . ' pimcore_area_editmode pimcore_area_editmode_hidden">';
+                echo '<div class="pimcore_area_editmode pimcore_area_editmode_hidden" data-name="' . $tag->getName() . ' data-real-name="' . $tag->getRealName() . '">';
                 $view->template($editScript);
                 echo '</div>';
             }

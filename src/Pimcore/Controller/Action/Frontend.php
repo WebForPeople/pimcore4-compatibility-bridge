@@ -16,6 +16,8 @@ namespace Pimcore\Controller\Action;
 
 use Pimcore\Controller\Action;
 use Pimcore\Config;
+use Pimcore\Document\Tag\Block\BlockState;
+use Pimcore\Document\Tag\Block\BlockStateStack;
 use Pimcore\Tool;
 use Pimcore\Tool\Authentication;
 use Pimcore\Tool\Session;
@@ -497,6 +499,11 @@ abstract class Frontend extends Action
         }
     }
 
+    private function getBlockStateStack(): BlockStateStack
+    {
+        return \Pimcore::getContainer()->get('pimcore.document.tag.block_state_stack');
+    }
+
     /**
      *
      */
@@ -509,18 +516,9 @@ abstract class Frontend extends Action
         // this is for $this->action() in templates when they are inside a block element
         try {
             if (!$this->getParam("disableBlockClearing")) {
-                $this->parentBlockCurrent = [];
-                if (\Zend_Registry::isRegistered('pimcore_tag_block_current')) {
-                    $this->parentBlockCurrent = \Zend_Registry::get("pimcore_tag_block_current");
-                }
-
-                $this->parentBlockNumeration = [];
-                if (\Zend_Registry::isRegistered('pimcore_tag_block_numeration')) {
-                    $this->parentBlockNumeration = \Zend_Registry::get("pimcore_tag_block_numeration");
-                }
-
-                \Zend_Registry::set("pimcore_tag_block_current", []);
-                \Zend_Registry::set("pimcore_tag_block_numeration", []);
+                // this is for $this->action() in templates when they are inside a block element
+                // adds a new, empty block state to the stack which is used in the sub-request
+                $this->getBlockStateStack()->push();
             }
         } catch (\Exception $e) {
             Logger::debug($e);
@@ -534,11 +532,13 @@ abstract class Frontend extends Action
     {
         parent::postDispatch();
 
-        if (isset($this->parentBlockCurrent) && $this->parentBlockCurrent && !$this->getParam("disableBlockClearing")) {
+        $blockStateStack = $this->getBlockStateStack();
+
+        if (!$this->getParam("disableBlockClearing") && $blockStateStack->count() > 1) {
             $this->forceRender();
 
-            \Zend_Registry::set("pimcore_tag_block_current", $this->parentBlockCurrent);
-            \Zend_Registry::set("pimcore_tag_block_numeration", $this->parentBlockNumeration);
+            // restore parent block data by removing sub-request block state
+            $blockStateStack->pop();
         }
 
         // restore the previous set locale if available
