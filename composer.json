@@ -3,6 +3,7 @@
   "license": "GPL-3.0",
   "require": {
     "pimcore/core-version": ">=5",
+    "pimcore/pimcore4-shims": "~1",
     "php-di/php-di": "~5",
     "zendframework/zendframework1": "~1.12"
   },
