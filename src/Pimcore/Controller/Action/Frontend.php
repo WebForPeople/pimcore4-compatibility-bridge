@@ -14,18 +14,16 @@
 
 namespace Pimcore\Controller\Action;
 
-use Pimcore\Controller\Action;
 use Pimcore\Config;
-use Pimcore\Document\Tag\Block\BlockState;
+use Pimcore\Controller\Action;
 use Pimcore\Document\Tag\Block\BlockStateStack;
-use Pimcore\Tool;
-use Pimcore\Tool\Authentication;
-use Pimcore\Tool\Session;
+use Pimcore\Logger;
+use Pimcore\Model;
 use Pimcore\Model\Document;
 use Pimcore\Model\Object;
-use Pimcore\Model;
+use Pimcore\Tool;
+use Pimcore\Tool\Session;
 use Pimcore\Translate;
-use Pimcore\Logger;
 
 abstract class Frontend extends Action
 {
@@ -70,7 +68,6 @@ abstract class Frontend extends Action
      */
     public function init()
     {
-
         // this is only executed once per request (first request)
         if (self::$isInitial) {
             \Pimcore::getEventManager()->trigger("frontend.controller.preInit", $this);
@@ -141,18 +138,17 @@ abstract class Frontend extends Action
 
         // this is only executed once per request (first request)
         if (self::$isInitial) {
+            // is responsible for loading the user either from session or from security component
+            $userLoader = \Pimcore::getContainer()->get('pimcore_admin.security.user_loader');
 
             // contains the logged in user if necessary
-            $user = null;
+            $user = $userLoader->getUser();
 
             // default is to set the editmode to false, is enabled later if necessary
             \Zend_Registry::set("pimcore_editmode", false);
 
             if (Tool::isFrontentRequestByAdmin()) {
                 $this->disableBrowserCache();
-
-                // start admin session & get logged in user
-                $user = Authentication::authenticateSession();
             }
 
             if (\Pimcore::inDebugMode()) {
@@ -171,12 +167,11 @@ abstract class Frontend extends Action
 
             // logged in users only
             if ($user) {
-
-                // set the user to registry so that it is available via \Pimcore\Tool\Admin::getCurrentUser();
-                \Zend_Registry::set("pimcore_admin_user", $user);
+                // fetch editmode from editmode resolver as it is able to force set the editmode
+                $editmode = \Pimcore::getContainer()->get('pimcore.service.request.editmode_resolver')->isEditmode();
 
                 // document editmode
-                if ($this->getParam("pimcore_editmode")) {
+                if ($editmode || $this->getParam("pimcore_editmode")) {
                     \Zend_Registry::set("pimcore_editmode", true);
 
                     // check if there is the document in the session
