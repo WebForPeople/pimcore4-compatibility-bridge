@@ -16,6 +16,7 @@ namespace Pimcore;
 
 use Composer\Autoload\ClassLoader;
 use Pimcore\Legacy\EventManager;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Legacy {
 
@@ -87,7 +88,7 @@ class Legacy {
         // detect frontend (website)
         $frontend = Tool::isFrontend();
 
-        self::registerFrontControllerPlugins($front, $frontend);
+        self::registerFrontControllerPlugins($front);
         self::initControllerFront($front);
 
         if ($returnResponse) {
@@ -98,13 +99,9 @@ class Legacy {
         $router = self::initRouter($front);
 
         // only do this if not frontend => performance issue
-        if (!$frontend) {
+        if (true || !$frontend) {
             self::initBackendRouter($router, $conf);
             self::checkPluginRoutes();
-
-            if ($conf) {
-                self::handleAdminMainDomainRedirect($conf);
-            }
         }
 
         static::setupZendViewRenderer();
@@ -114,29 +111,16 @@ class Legacy {
     }
 
     /**
-     * Force the main (default) domain for "admin" requests
-     *
-     * @param \Pimcore\Config\Config $conf
-     */
-    protected static function handleAdminMainDomainRedirect(\Pimcore\Config\Config $conf)
-    {
-        if ($conf->general->domain && $conf->general->domain != Tool::getHostname()) {
-            $url = (($_SERVER['HTTPS'] == "on") ? "https" : "http") . "://" . $conf->general->domain . $_SERVER["REQUEST_URI"];
-            header("HTTP/1.1 301 Moved Permanently");
-            header("Location: " . $url, true, 301);
-            exit;
-        }
-    }
-
-    /**
      * Check if this request routes into a plugin, if so check if the plugin is enabled
      */
     protected static function checkPluginRoutes()
     {
-        if (preg_match("@^/plugin/([^/]+)/.*@", $_SERVER["REQUEST_URI"], $matches)) {
+        $request = \Pimcore::getContainer()->get('pimcore.http.request_helper')->getMasterRequest();
+
+        if (preg_match("@^/plugin/([^/]+)/.*@", $request->getRequestUri(), $matches)) {
             $pluginName = $matches[1];
             if (!\Pimcore\ExtensionManager::isEnabled("plugin", $pluginName)) {
-                \Pimcore\Tool::exitWithError("Plugin is disabled. To use this plugin please enable it in the extension manager!");
+                throw new AccessDeniedHttpException("Plugin is disabled. To use this plugin please enable it in the extension manager!");
             }
         }
     }
@@ -209,7 +193,10 @@ class Legacy {
                 header("HTTP/1.0 404 Not Found");
             }
             Logger::err($e);
-            throw new \Zend_Controller_Router_Exception("No route, document, custom route or redirect is matching the request: " . $_SERVER["REQUEST_URI"] . " | \n" . "Specific ERROR: " . $e->getMessage());
+
+            $request = \Pimcore::getContainer()->get('pimcore.http.request_helper')->getCurrentRequest();
+
+            throw new \Zend_Controller_Router_Exception("No route, document, custom route or redirect is matching the request: " . $request->getRequestUri() . " | \n" . "Specific ERROR: " . $e->getMessage());
         } catch (\Exception $e) {
             if (!headers_sent()) {
                 header("HTTP/1.0 500 Internal Server Error");
@@ -222,13 +209,12 @@ class Legacy {
      * Register front controller plugins
      *
      * @param \Zend_Controller_Front $front
-     * @param bool $frontend
      */
-    protected static function registerFrontControllerPlugins(\Zend_Controller_Front $front, $frontend)
+    protected static function registerFrontControllerPlugins(\Zend_Controller_Front $front)
     {
         $front->registerPlugin(new Controller\Plugin\ErrorHandler(), 1);
 
-        if (Tool::useFrontendOutputFilters(new \Zend_Controller_Request_Http())) {
+        if (Tool::useFrontendOutputFilters()) {
             $front->registerPlugin(new Controller\Plugin\HttpErrorLog(), 850);
         }
     }
@@ -261,51 +247,6 @@ class Legacy {
      */
     protected static function initBackendRouter(\Zend_Controller_Router_Interface $router, $conf)
     {
-        $routeAdmin = new \Zend_Controller_Router_Route(
-            'admin/:controller/:action/*',
-            [
-                'module' => 'admin',
-                "controller" => "index",
-                "action" => "index"
-            ]
-        );
-
-        $routeInstall = new \Zend_Controller_Router_Route(
-            'install/:controller/:action/*',
-            [
-                'module' => 'install',
-                "controller" => "index",
-                "action" => "index"
-            ]
-        );
-
-        $routeUpdate = new \Zend_Controller_Router_Route(
-            'admin/update/:controller/:action/*',
-            [
-                'module' => 'update',
-                "controller" => "index",
-                "action" => "index"
-            ]
-        );
-
-        $routeExtensions = new \Zend_Controller_Router_Route(
-            'admin/extensionmanager/:controller/:action/*',
-            [
-                'module' => 'extensionmanager',
-                "controller" => "index",
-                "action" => "index"
-            ]
-        );
-
-        $routeReports = new \Zend_Controller_Router_Route(
-            'admin/reports/:controller/:action/*',
-            [
-                'module' => 'reports',
-                "controller" => "index",
-                "action" => "index"
-            ]
-        );
-
         $routePlugin = new \Zend_Controller_Router_Route(
             'plugin/:module/:controller/:action/*',
             [
@@ -314,35 +255,7 @@ class Legacy {
             ]
         );
 
-        $routeWebservice = new \Zend_Controller_Router_Route(
-            'webservice/:controller/:action/*',
-            [
-                "module" => "webservice",
-                "controller" => "index",
-                "action" => "index"
-            ]
-        );
-
-        $routeSearchAdmin = new \Zend_Controller_Router_Route(
-            'admin/search/:controller/:action/*',
-            [
-                "module" => "searchadmin",
-                "controller" => "index",
-                "action" => "index",
-            ]
-        );
-
-        $router->addRoute("install", $routeInstall);
         $router->addRoute('plugin', $routePlugin);
-        $router->addRoute('admin', $routeAdmin);
-        $router->addRoute('update', $routeUpdate);
-        $router->addRoute('extensionmanager', $routeExtensions);
-        $router->addRoute('reports', $routeReports);
-        $router->addRoute('searchadmin', $routeSearchAdmin);
-
-        if ($conf instanceof \Pimcore\Config\Config and $conf->webservice and $conf->webservice->enabled) {
-            $router->addRoute('webservice', $routeWebservice);
-        }
     }
 
     /**
