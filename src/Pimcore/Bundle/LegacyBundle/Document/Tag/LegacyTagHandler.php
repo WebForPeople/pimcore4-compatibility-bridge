@@ -22,9 +22,23 @@ use Pimcore\Model\Document\Tag\Area\AbstractArea;
 use Pimcore\Model\Document\Tag\Area\Info;
 use Pimcore\Tool;
 use Pimcore\View;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LegacyTagHandler implements TagHandlerInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -81,8 +95,8 @@ class LegacyTagHandler implements TagHandlerInterface
                         }
                     }
 
-                    $n = Translate::transAdmin((string)$areaConfig->name);
-                    $d = Translate::transAdmin((string)$areaConfig->description);
+                    $n = $this->translator->trans((string)$areaConfig->name, [], 'admin');
+                    $d = $this->translator->trans((string)$areaConfig->description, [], 'admin');
                 }
 
                 $availableAreas[$areaName] = [

@@ -31,6 +31,8 @@ services:
     # legacy tag handler supporting Pimcore\View - injected into delegating tag handler in compiler pass
     pimcore.document.tag.handler.legacy:
         class: Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler
+        arguments:
+            - '@translator'
 
     # provides rendering of documents with legacy ZF1 stack
     pimcore.legacy.document.renderer:
