@@ -33,6 +33,17 @@ class EventManager extends \Zend_EventManager_EventManager {
 
     public function attach($event, $callback = null, $priority = 1)
     {
+        // support multiple events passed as array - Zend_EventManager is expected
+        // to return an array of listeners if an array of events is passed
+        if (is_array($event)) {
+            $listeners = [];
+            foreach ($event as $eventName) {
+                $listeners[] = $this->attach($eventName, $callback, $priority);
+            }
+
+            return $listeners;
+        }
+
         $self = $this;
         $eventName = $event;
         $newEventName = "pimcore." . $eventName;
