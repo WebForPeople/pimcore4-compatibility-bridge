@@ -1,0 +1,8 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # adds legacy plugin assets to admin interface and editmode
+    Pimcore\Bundle\LegacyBundle\EventListener\PluginAssetListener: ~

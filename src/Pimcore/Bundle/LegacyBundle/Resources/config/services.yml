@@ -1,52 +1,51 @@
 services:
-    pimcore.legacy_kernel:
-        class: Pimcore\Bundle\LegacyBundle\HttpKernel\Kernel
-        arguments: ['@kernel']
+    _defaults:
+        autowire: true
+        autoconfigure: true
 
-    pimcore.legacy.fallback_router:
-        class: Pimcore\Bundle\LegacyBundle\Routing\FallbackRouter
-        arguments: ['@router.request_context']
+    # aliases for BC
+    pimcore.legacy_kernel: '@Pimcore\Bundle\LegacyBundle\HttpKernel\Kernel'
+    pimcore.legacy.fallback_router: '@Pimcore\Bundle\LegacyBundle\Routing\FallbackRouter'
+    pimcore.legacy.plugin_broker: '@Pimcore\API\Plugin\Broker'
+    pimcore.legacy.controller.admin.extension_manager: '@Pimcore\Bundle\LegacyBundle\Controller\Admin\ExtensionManager\LegacyExtensionManagerController'
+    pimcore.legacy.zend_view_helper_bridge: '@Pimcore\Bundle\LegacyBundle\Zend\View\ViewHelperBridge'
+    pimcore.legacy.zend_view_provider: '@Pimcore\Bundle\LegacyBundle\Zend\View\ViewProvider'
+    pimcore.document.tag.handler.legacy: '@Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler'
+    pimcore.legacy.document.renderer: '@Pimcore\Bundle\LegacyBundle\Document\Renderer\LegacyDocumentRenderer'
+    pimcore.legacy.templating.view_helper.pimcore_url: '@Pimcore\Bundle\LegacyBundle\Templating\Helper\PimcoreUrl'
+
+    Pimcore\Bundle\LegacyBundle\HttpKernel\Kernel:
+        arguments:
+            - '@kernel'
+
+    Pimcore\Bundle\LegacyBundle\Routing\FallbackRouter:
+        arguments:
+            - '@router.request_context'
         tags:
             - { name: router, priority: -200 }
 
-    pimcore.legacy.plugin_broker:
-        class: Pimcore\API\Plugin\Broker
+    Pimcore\API\Plugin\Broker: ~
 
     # the legacy extension manager controller is defined as service as it is used
     # by the extension manager controller to get the list of legacy extensions
-    pimcore.legacy.controller.admin.extension_manager:
-        class: Pimcore\Bundle\LegacyBundle\Controller\Admin\ExtensionManager\LegacyExtensionManagerController
+    Pimcore\Bundle\LegacyBundle\Controller\Admin\ExtensionManager\LegacyExtensionManagerController:
         calls:
             - [setContainer, ['@service_container']]
 
     # executes ZF1 view helpers
-    pimcore.legacy.zend_view_helper_bridge:
-        class: Pimcore\Bundle\LegacyBundle\Zend\View\ViewHelperBridge
-        arguments: ['@pimcore.legacy.zend_view_provider', '@pimcore.service.request.template_vars_resolver']
+    Pimcore\Bundle\LegacyBundle\Zend\View\ViewHelperBridge: ~
 
     # creates configured Pimcore\View instances
-    pimcore.legacy.zend_view_provider:
-        class: Pimcore\Bundle\LegacyBundle\Zend\View\ViewProvider
+    Pimcore\Bundle\LegacyBundle\Zend\View\ViewProvider: ~
 
     # legacy tag handler supporting Pimcore\View - injected into delegating tag handler in compiler pass
-    pimcore.document.tag.handler.legacy:
-        class: Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler
-        arguments:
-            - '@translator'
+    Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler: ~
 
     # provides rendering of documents with legacy ZF1 stack
-    pimcore.legacy.document.renderer:
-      class: Pimcore\Bundle\LegacyBundle\Document\Renderer\LegacyDocumentRenderer
-      arguments: ['@pimcore.legacy_kernel']
-
-    # adds legacy plugin assets to admin interface and editmode
-    pimcore.legacy.plugin_asset_listener:
-        class: Pimcore\Bundle\LegacyBundle\EventListener\PluginAssetListener
-        tags:
-            - { name: kernel.event_subscriber }
+    Pimcore\Bundle\LegacyBundle\Document\Renderer\LegacyDocumentRenderer: ~
 
     # decorates default pimcore_url helper and adds fallback to legacy static routes
-    pimcore.legacy.templating.view_helper.pimcore_url:
-        class: Pimcore\Bundle\LegacyBundle\Templating\Helper\PimcoreUrl
-        decorates: pimcore.templating.view_helper.pimcore_url
-        arguments: ['@router', '@pimcore.http.request_helper']
+    Pimcore\Bundle\LegacyBundle\Templating\Helper\PimcoreUrl:
+        decorates: Pimcore\Templating\Helper\PimcoreUrl
+        arguments:
+             $generator: '@router'
