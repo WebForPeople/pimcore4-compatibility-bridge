@@ -39,7 +39,9 @@ services:
     Pimcore\Bundle\LegacyBundle\Zend\View\ViewProvider: ~
 
     # legacy tag handler supporting Pimcore\View - injected into delegating tag handler in compiler pass
-    Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler: ~
+    Pimcore\Bundle\LegacyBundle\Document\Tag\LegacyTagHandler:
+        arguments:
+            $translator: '@Pimcore\Bundle\AdminBundle\Translation\AdminUserTranslator'
 
     # provides rendering of documents with legacy ZF1 stack
     Pimcore\Bundle\LegacyBundle\Document\Renderer\LegacyDocumentRenderer: ~

@@ -94,8 +94,8 @@ class LegacyTagHandler implements TagHandlerInterface
                         }
                     }
 
-                    $n = $this->translator->trans((string)$areaConfig->name, [], 'admin');
-                    $d = $this->translator->trans((string)$areaConfig->description, [], 'admin');
+                    $n = $this->translator->trans((string)$areaConfig->name);
+                    $d = $this->translator->trans((string)$areaConfig->description);
                 }
 
                 $availableAreas[$areaName] = [
