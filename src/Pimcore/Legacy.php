@@ -15,6 +15,7 @@
 namespace Pimcore;
 
 use Composer\Autoload\ClassLoader;
+use Pimcore\API\Plugin\Broker;
 use Pimcore\Legacy\EventManager;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -299,7 +300,7 @@ class Legacy {
         }
 
         /** @var \Pimcore\API\Plugin\Broker $broker */
-        $broker = \Pimcore::getContainer()->get('pimcore.legacy.plugin_broker');
+        $broker = \Pimcore::getContainer()->get(Broker::class);
 
         /** @var ClassLoader $autoloader */
         $autoloader = require PIMCORE_COMPOSER_PATH . '/autoload.php';

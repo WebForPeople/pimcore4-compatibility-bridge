@@ -14,6 +14,7 @@
 
 namespace Pimcore\Bundle\LegacyBundle\HttpKernel;
 
+use Pimcore\API\Plugin\Broker;
 use Pimcore\Config;
 use Pimcore\Legacy;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -89,7 +90,7 @@ class Kernel implements KernelInterface
      */
     protected function initializePlugins()
     {
-        $this->getContainer()->get('pimcore.legacy.plugin_broker')->initPlugins();
+        $this->getContainer()->get(Broker::class)->initPlugins();
     }
 
     /**

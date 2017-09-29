@@ -29,11 +29,11 @@ class Broker
     /**
      * @return mixed|Broker
      * @throws \Exception
-     * @deprecated Use pimcore.legacy.plugin_broker service
+     * @deprecated Use Pimcore\API\Plugin\Broker service
      */
     public static function getInstance()
     {
-        $broker = \Pimcore::getKernel()->getContainer()->get('pimcore.legacy.plugin_broker');
+        $broker = \Pimcore::getKernel()->getContainer()->get(Broker::class);
 
         return $broker;
     }
