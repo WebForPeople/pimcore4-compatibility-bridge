@@ -6,7 +6,15 @@ migrate your Pimcore 4 projects (Zend Framework) to Pimcore 5 (Symfony).
   
 ## Installation
 
-* [Installation docs](https://www.pimcore.org/docs/5.0.0/Installation_and_Upgrade/Updating_Pimcore/Upgrade_from_4_to_5/Migrate_for_Compatibility_Bridge.html)
+Install the compatibility bridge package:
+
+```
+$ composer require pimcore/pimcore4-compatibility-bridge --no-scripts
+$ composer update
+```
+
+Follow the [Installation docs](https://www.pimcore.org/docs/5.0.0/Installation_and_Upgrade/Updating_Pimcore/Upgrade_from_4_to_5/Migrate_for_Compatibility_Bridge.html)
+for further steps.
 
 ## License
 [GPLv3 & PEL](./LICENSE.md)
