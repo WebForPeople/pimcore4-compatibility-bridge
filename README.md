@@ -1,5 +1,7 @@
 # Pimcore 4 Compatibility Bridge 
- 
+
+## !UNMAINTAINED! Use at your own risk! 
+
 This package contains the Pimcore 4 compatibilty bridge, which adds the ZF1 dependency and some classes to 
 provide a fallback/bridge onto the ZF environment in Pimcore 5 projects. By using this package, you can gradually
 migrate your Pimcore 4 projects (Zend Framework) to Pimcore 5 (Symfony).
