@@ -1,5 +1,5 @@
 {
-  "name": "pimcore/pimcore4-compatibility-bridge",
+  "name": "web4people/pimcore4-compatibility-bridge",
   "license": "GPL-3.0",
   "require": {
     "pimcore/core-version": ">=5",
