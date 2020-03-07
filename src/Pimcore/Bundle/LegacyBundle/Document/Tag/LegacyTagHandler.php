@@ -200,7 +200,7 @@ class LegacyTagHandler implements TagHandlerInterface
             $editmode = $view->editmode;
 
             if ($actionObject && method_exists($actionObject, "getBrickHtmlTagOpen")) {
-                echo $actionObject->getBrickHtmlTagOpen($this);
+                echo $actionObject->getBrickHtmlTagOpen($info);
             } else {
                 echo '<div class="pimcore_area_' . $type . ' pimcore_area_content">';
             }
@@ -225,7 +225,7 @@ class LegacyTagHandler implements TagHandlerInterface
             }
 
             if ($actionObject && method_exists($actionObject, "getBrickHtmlTagClose")) {
-                echo $actionObject->getBrickHtmlTagClose($this);
+                echo $actionObject->getBrickHtmlTagClose($info);
             } else {
                 echo '</div>';
             }
