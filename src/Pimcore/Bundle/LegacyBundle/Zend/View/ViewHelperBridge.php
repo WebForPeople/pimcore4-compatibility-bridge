@@ -14,7 +14,7 @@
 
 namespace Pimcore\Bundle\LegacyBundle\Zend\View;
 
-use Pimcore\Service\Request\TemplateVarsResolver;
+use Pimcore\Http\Request\Resolver\TemplateVarsResolver;
 use Pimcore\View;
 
 class ViewHelperBridge
