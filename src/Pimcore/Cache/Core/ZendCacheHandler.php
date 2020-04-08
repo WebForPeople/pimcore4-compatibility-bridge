@@ -114,7 +114,11 @@ class ZendCacheHandler implements EventSubscriberInterface, LoggerAwareInterface
 
         // TODO if the ZF backend and the handler itemPool are the same, purge will be called twice. However, not
         // calling clean would result in ZF cache never being cleaned up if the backend differs from the core item pool.
-        return $this->cache->clean(\Zend_Cache::CLEANING_MODE_OLD);
+        try{
+            return $this->cache->clean(\Zend_Cache::CLEANING_MODE_OLD);
+        }catch(\Pimcore\Cache\Backend\Exception\NotImplementedException $e){
+            \Pimcore\Logger::warn($e);
+        }
     }
 
     /**
