@@ -11,7 +11,7 @@ migrate your Pimcore 4 projects (Zend Framework) to Pimcore 5 (Symfony).
 Install the compatibility bridge package:
 
 ```
-$ composer require pimcore/pimcore4-compatibility-bridge --no-scripts
+$ composer require web4people/pimcore4-compatibility-bridge --no-scripts
 $ composer update
 ```
 
