@@ -90,7 +90,11 @@ class LegacyDocumentRenderer implements DocumentRendererInterface
             if ($view->$key) {
                 $viewParamsBackup[$key] = $view->$key;
             }
-            $view->$key = $value;
+            if (substr($key, 0, 1) === "_") {
+                \Pimcore\Logger::warn("Unable to set Key: {$key} on view as Zend View protects internal keys begining with underscore!");
+            }else{
+                $view->$key = $value;
+            }
         }
         $view->document = $document;
 
@@ -113,7 +117,11 @@ class LegacyDocumentRenderer implements DocumentRendererInterface
                 $layout->{$layout->getContentKey()} = $content;
                 if (is_array($params)) {
                     foreach ($params as $key => $value) {
-                        $layout->getView()->$key = $value;
+                        if (substr($key, 0, 1) === "_") {
+                            \Pimcore\Logger::warn("Unable to set Key: {$key} on view as Zend View protects internal keys begining with underscore!");
+                        }else{
+                            $layout->getView()->$key = $value;
+                        }
                     }
                 }
 
