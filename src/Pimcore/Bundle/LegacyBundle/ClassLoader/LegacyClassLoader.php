@@ -53,7 +53,14 @@ class LegacyClassLoader
 
             // first check for a model, if it doesnt't work fall back to the default autoloader
             if (!class_exists($class, false) && !interface_exists($class, false)) {
-                \Pimcore::getAutoloader()->loadClass($class);
+                try {
+                    \Pimcore::getAutoloader()->loadClass($class);
+                }catch (\TypeError $e){
+                    /** @var $loader \Composer\Autoload\ClassLoader */
+                    $loader = include __DIR__ . '/../../../../../../../../vendor/autoload.php';
+                    \Pimcore::setAutoloader($loader);
+                    \Pimcore::getAutoloader()->loadClass($class);
+                }
             }
 
             if (class_exists($class, false) || interface_exists($class, false)) {
