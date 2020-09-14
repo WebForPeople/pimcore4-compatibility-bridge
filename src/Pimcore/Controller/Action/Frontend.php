@@ -141,7 +141,11 @@ abstract class Frontend extends Action
             $userLoader = \Pimcore::getContainer()->get('pimcore_admin.security.user_loader');
 
             // contains the logged in user if necessary
-            $user = $userLoader->getUser();
+            try{
+                $user = $userLoader->getUser();
+            } catch (\LogicException $e){
+                Logger::debug($e);
+            }
 
             // default is to set the editmode to false, is enabled later if necessary
             \Zend_Registry::set("pimcore_editmode", false);

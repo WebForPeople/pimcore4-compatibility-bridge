@@ -116,13 +116,17 @@ class Legacy {
      */
     protected static function checkPluginRoutes()
     {
-        $request = \Pimcore::getContainer()->get('pimcore.http.request_helper')->getMasterRequest();
+        try{
+            $request = \Pimcore::getContainer()->get('pimcore.http.request_helper')->getMasterRequest();
 
-        if (preg_match("@^/plugin/([^/]+)/.*@", $request->getRequestUri(), $matches)) {
-            $pluginName = $matches[1];
-            if (!\Pimcore\ExtensionManager::isEnabled("plugin", $pluginName)) {
-                throw new AccessDeniedHttpException("Plugin is disabled. To use this plugin please enable it in the extension manager!");
+            if (preg_match("@^/plugin/([^/]+)/.*@", $request->getRequestUri(), $matches)) {
+                $pluginName = $matches[1];
+                if (!\Pimcore\ExtensionManager::isEnabled("plugin", $pluginName)) {
+                    throw new AccessDeniedHttpException("Plugin is disabled. To use this plugin please enable it in the extension manager!");
+                }
             }
+        } catch (\LogicException $e){
+            Logger::debug($e);
         }
     }
 
