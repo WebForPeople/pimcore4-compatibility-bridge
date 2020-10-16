@@ -322,9 +322,9 @@ abstract class Frontend extends Action
             $locale = new \Zend_Locale($locale);
             \Zend_Registry::set('Zend_Locale', $locale);
             $this->getResponse()->setHeader("Content-Language", strtolower(str_replace("_", "-", (string) $locale)), true);
-
-            \Pimcore::getContainer()->get("request_stack")->getCurrentRequest()->setLocale((string) $locale);
-
+            if ($request = \Pimcore::getContainer()->get("request_stack")->getCurrentRequest()){
+                $request->setLocale((string) $locale);
+            }
             // now we prepare everything for setlocale()
             $localeList = [(string) $locale . ".utf8"];
 
