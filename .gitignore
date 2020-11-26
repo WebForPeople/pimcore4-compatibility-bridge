@@ -3,3 +3,4 @@
 # composer
 /composer.lock
 /vendor
+/nbproject/private/

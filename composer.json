@@ -8,6 +8,9 @@
     "zendframework/zendframework1": "~1.12",
     "symfony/monolog-bundle": "v3.5.0"
   },
+  "conflict": {
+        "web4people/websitecms": "*"
+  },
   "autoload": {
     "psr-4": {
       "Pimcore\\": "src/Pimcore/"
