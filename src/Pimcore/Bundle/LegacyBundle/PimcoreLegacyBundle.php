@@ -14,6 +14,7 @@
 
 namespace Pimcore\Bundle\LegacyBundle;
 
+use Pimcore\API\Plugin\Broker;
 use Pimcore\Bundle\LegacyBundle\ClassLoader\LegacyClassLoader;
 use Pimcore\Bundle\LegacyBundle\DependencyInjection\Compiler\LegacyAreaHandlerPass;
 use Pimcore\Legacy;
@@ -45,6 +46,11 @@ class PimcoreLegacyBundle extends Bundle
 
         if(php_sapi_name() == "cli") {
             $this->setupCliEnvironment();
+            //Looks like legacy plugins are not initialized via Legacy Kernel in CLI mode so we are initializing them here
+            /** @var \Pimcore\API\Plugin\Broker $broker */
+            if ($broker = \Pimcore::getContainer()->get(Broker::class)){
+                $broker->initPlugins();
+            }
         }
 
         \Zend_Registry::_unsetInstance();
