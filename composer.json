@@ -1,19 +1,20 @@
 {
-  "name": "web4people/pimcore4-compatibility-bridge",
-  "license": "GPL-3.0",
-  "require": {
-    "pimcore/core-version": "~5",
-    "pimcore/pimcore4-shims": "~1",
-    "php-di/php-di": "~5",
-    "zendframework/zendframework1": "~1.12",
-    "symfony/monolog-bundle": "v3.5.0"
-  },
-  "conflict": {
+    "name": "web4people/pimcore4-compatibility-bridge",
+    "license": "GPL-3.0",
+    "require": {
+        "pimcore/core-version": "~5",
+        "pimcore/pimcore4-shims": "~1",
+        "php-di/php-di": "~5",
+        "zendframework/zendframework1": "~1.12",
+        "symfony/monolog-bundle": "v3.5.0",
+        "doctrine/dbal": "~2.10.4"
+    },
+    "conflict": {
         "web4people/websitecms": "*"
-  },
-  "autoload": {
-    "psr-4": {
-      "Pimcore\\": "src/Pimcore/"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pimcore\\": "src/Pimcore/"
+        }
     }
-  }
 }
