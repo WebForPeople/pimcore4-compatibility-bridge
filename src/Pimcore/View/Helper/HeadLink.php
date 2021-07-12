@@ -16,6 +16,20 @@ namespace Pimcore\View\Helper;
 
 class HeadLink extends \Zend_View_Helper_HeadLink
 {
+    
+    /**
+     * Constructor
+     *
+     * Use PHP_EOL as separator
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->_itemKeys[] = "as";
+    }
+    
     /**
      * @var bool
      */
