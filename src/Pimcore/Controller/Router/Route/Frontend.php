@@ -463,7 +463,7 @@ class Frontend extends \Zend_Controller_Router_Route_Abstract
 
             foreach ($this->redirects as $redirect) {
                 $matchAgainst = $matchRequestUri;
-                if ($redirect->getSourceEntireUrl()) {
+                if (method_exists($redirect, 'getSourceEntireUrl') && $redirect->getSourceEntireUrl()) {
                     $matchAgainst = $matchUrl;
                 }
 
@@ -506,7 +506,7 @@ class Frontend extends \Zend_Controller_Router_Route_Abstract
                                 Logger::error("Site with ID " . $redirect->getTargetSite() . " not found.");
                                 continue;
                             }
-                        } elseif (!preg_match("@http(s)?://@i", $url) && $config->general->domain && $redirect->getSourceEntireUrl()) {
+                        } elseif (!preg_match("@http(s)?://@i", $url) && $config->general->domain && method_exists($redirect, 'getSourceEntireUrl') && $redirect->getSourceEntireUrl()) {
                             // prepend the host and scheme to avoid infinite loops when using "domain" redirects
                             $url = ($front->getRequest()->isSecure() ? "https" : "http") . "://" . $config->general->domain . $url;
                         }
