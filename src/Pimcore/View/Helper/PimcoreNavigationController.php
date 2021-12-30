@@ -91,16 +91,16 @@ class PimcoreNavigationController
 
         // set active path
         $requestStack = \Pimcore::getKernel()->getContainer()->get('request_stack');
-        $request = $requestStack->getMasterRequest();
+        if ($request = $requestStack->getMasterRequest()){
 
-        // try to find a page matching exactly the request uri
-        $activePages = $navigation->findAllBy("uri", $request->getRequestUri());
+            // try to find a page matching exactly the request uri
+            $activePages = $navigation->findAllBy("uri", $request->getRequestUri());
 
-        if (empty($activePages)) {
-            // try to find a page matching the path info
-            $activePages = $navigation->findAllBy("uri", $request->getPathInfo());
+            if (empty($activePages)) {
+                // try to find a page matching the path info
+                $activePages = $navigation->findAllBy("uri", $request->getPathInfo());
+            }
         }
-
         if (empty($activePages)) {
             // use the provided pimcore document
             $activePages = $navigation->findAllBy("realFullPath", $activeDocument->getRealFullPath());
