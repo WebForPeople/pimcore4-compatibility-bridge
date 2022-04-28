@@ -25,6 +25,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class LegacyTagHandler implements TagHandlerInterface
 {
+    private $translations = [];
+    
     /**
      * @var TranslatorInterface
      */
@@ -94,8 +96,18 @@ class LegacyTagHandler implements TagHandlerInterface
                         }
                     }
 
-                    $n = $this->translator->trans((string)$areaConfig->name);
-                    $d = $this->translator->trans((string)$areaConfig->description);
+                    if (array_key_exists((string)$areaConfig->name, $this->translations)){
+                        $n = $this->translations[(string)$areaConfig->name];
+                    }else{
+                        $n = $this->translator->trans((string)$areaConfig->name);
+                        $this->translations[(string)$areaConfig->name] =  $n;
+                    }
+                    if (array_key_exists((string)$areaConfig->description, $this->translations)){
+                        $d = $this->translations[(string)$areaConfig->description];
+                    }else{
+                        $d = $this->translator->trans((string)$areaConfig->description);
+                        $this->translations[(string)$areaConfig->description] =  $d;
+                    }
                 }
 
                 $availableAreas[$areaName] = [
