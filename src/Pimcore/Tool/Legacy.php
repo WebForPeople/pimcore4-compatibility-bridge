@@ -19,6 +19,11 @@ use Pimcore\Tool;
 
 class Legacy {
 
+    /**
+     * @var null
+     */
+    protected static $isFrontend = null;
+
 
     /**
      * @param string $type
@@ -54,6 +59,106 @@ class Legacy {
         return $client;
     }
 
+    /**
+     * @static
+     * @param \Zend_Controller_Request_Abstract $request
+     * @return bool
+     */
+    public static function useFrontendOutputFilters(\Zend_Controller_Request_Abstract $request)
+    {
+
+        // check for module
+        if (!self::isFrontend()) {
+            return false;
+        }
+
+        if (self::isFrontendRequestByAdmin()) {
+            return false;
+        }
+
+        // check for manually disabled ?pimcore_outputfilters_disabled=true
+        if ($request->getParam("pimcore_outputfilters_disabled") && PIMCORE_DEBUG) {
+            return false;
+        }
 
 
+        return true;
+    }
+    /**
+     * eg. editmode, preview, version preview, always when it is a "frontend-request", but called out of the admin
+     */
+    public static function isFrontendRequestByAdmin()
+    {
+        if (array_key_exists("pimcore_editmode", $_REQUEST)
+            || array_key_exists("pimcore_preview", $_REQUEST)
+            || array_key_exists("pimcore_admin", $_REQUEST)
+            || array_key_exists("pimcore_object_preview", $_REQUEST)
+            || array_key_exists("pimcore_version", $_REQUEST)
+            || (isset($_SERVER["REQUEST_URI"]) && preg_match("@^/pimcore_document_tag_renderlet@", $_SERVER["REQUEST_URI"]))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @static
+     * @return bool
+     */
+    public static function isFrontend()
+    {
+        if (self::$isFrontend !== null) {
+            return self::$isFrontend;
+        }
+
+        $isFrontend = true;
+
+        if ($isFrontend && php_sapi_name() == "cli") {
+            $isFrontend = false;
+        }
+
+        if ($isFrontend && \Pimcore::inAdmin()) {
+            $isFrontend = false;
+        }
+
+        if ($isFrontend && isset($_SERVER["REQUEST_URI"])) {
+            $excludePatterns = [
+                "/^\/admin.*/",
+                "/^\/install.*/",
+                "/^\/plugin.*/",
+                "/^\/webservice.*/"
+            ];
+
+            foreach ($excludePatterns as $pattern) {
+                if (preg_match($pattern, $_SERVER["REQUEST_URI"])) {
+                    $isFrontend = false;
+                    break;
+                }
+            }
+        }
+
+        self::$isFrontend = $isFrontend;
+
+        return $isFrontend;
+    }
+
+    /**
+     * @static
+     * @param \Zend_Controller_Response_Abstract $response
+     * @return bool
+     */
+    public static function isHtmlResponse(\Zend_Controller_Response_Abstract $response)
+    {
+        // check if response is html
+        $headers = $response->getHeaders();
+        foreach ($headers as $header) {
+            if ($header["name"] == "Content-Type") {
+                if (strpos($header["value"], "html") === false) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

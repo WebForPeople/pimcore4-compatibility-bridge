@@ -249,6 +249,9 @@ abstract class Frontend extends Action
                 if ($this->getParam("_ptp") && self::$isInitial) {
                     $this->getDocument()->setUsePersona($this->getParam("_ptp"));
                 }
+                if ($this->getParam("_ptg") && self::$isInitial) {
+                    $this->getDocument()->setUsePersona($this->getParam("_ptg"));
+                }
             }
 
             // check if document is a wrapped hardlink, if this is the case send a rel=canonical header to the source document

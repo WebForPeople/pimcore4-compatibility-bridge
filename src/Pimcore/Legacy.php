@@ -218,6 +218,7 @@ class Legacy {
     protected static function registerFrontControllerPlugins(\Zend_Controller_Front $front)
     {
         $front->registerPlugin(new Controller\Plugin\ErrorHandler(), 1);
+        $front->registerPlugin(new Controller\Plugin\Targeting(), 805);
 
         if (Tool::useFrontendOutputFilters()) {
             $front->registerPlugin(new Controller\Plugin\HttpErrorLog(), 850);
