@@ -105,7 +105,7 @@ class Targeting extends \Zend_Controller_Plugin_Abstract
      */
     public function dispatchLoopShutdown()
     {
-        if (!Tool::isHtmlResponse($this->getResponse())) {
+        if (!Tool\Legacy::isHtmlResponse($this->getResponse())) {
             return;
         }
 
