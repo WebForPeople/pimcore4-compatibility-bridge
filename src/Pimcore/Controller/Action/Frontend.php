@@ -170,9 +170,13 @@ abstract class Frontend extends Action
 
             // logged in users only
             if ($user) {
-                // fetch editmode from editmode resolver as it is able to force set the editmode
-                $editmode = \Pimcore::getContainer()->get('pimcore.service.request.editmode_resolver')->isEditmode();
-
+                if ($this->_request && $this->_request->getParam("_editmode") === false) {
+                    $editmode = false;
+                    $this->setParam("pimcore_editmode", false);
+                }else {
+                    // fetch editmode from editmode resolver as it is able to force set the editmode
+                    $editmode = \Pimcore::getContainer()->get('pimcore.service.request.editmode_resolver')->isEditmode();
+                }
                 // document editmode
                 if ($editmode || $this->getParam("pimcore_editmode")) {
                     \Zend_Registry::set("pimcore_editmode", true);
